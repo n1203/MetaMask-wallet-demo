@@ -5,9 +5,9 @@
  * 参考文章：https://hicoldcat.com/posts/blockchain/how-to-build-a-web3-login-with-web3js-library/
  */
 import Web3 from "web3";
-import ETHContract from "@/abi/ETH.json";
 import { useEffect, useMemo, useState } from "react";
 import { USER_WALLET_ADDRESS } from "@/const/localstorage";
+const ETHContract = require('../abi/eth.json')
 
 export function useConnectMetamask() {
   // 用户钱包地址集合
