@@ -28,7 +28,9 @@ export function useConnectMetamask() {
     const exampleMessage = '你好, 欢迎 👏 登录！';
     if (!window.ethereum) return alert("请先安装metamask钱包");
     try {
-      var from = await window.web3.eth.getAccounts();
+      const from = await window.ethereum.request({
+        method: "eth_requestAccounts",
+      })
       const msg = `0x${Buffer.from(exampleMessage, 'utf8').toString('hex')}`;
       await window.ethereum.request({
           "method": "personal_sign",
@@ -37,14 +39,11 @@ export function useConnectMetamask() {
             from[0]
           ]
       });
-      const accounts = await window.ethereum.request({
-        method: "eth_requestAccounts",
-      });
       // 保存用户钱包地址
-      setAddresses((accounts || []) as string[]);
+      setAddresses((from || []) as string[]);
       localStorage.setItem(
         USER_WALLET_ADDRESS,
-        JSON.stringify(accounts)
+        JSON.stringify(from)
       );
     } catch (err) {
       console.error(err);
