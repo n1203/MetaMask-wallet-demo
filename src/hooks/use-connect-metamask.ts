@@ -22,22 +22,30 @@ export function useConnectMetamask() {
    * @returns
    */
   const connectMetamask = async () => {
-    // 检测是否安装metamask钱包
-    if (!window.ethereum) return alert("请先安装metamask钱包");
     setLoading(true);
+    const exampleMessage = '你好, 欢迎 👏 登录！';
+    if (!window.ethereum) return alert("请先安装metamask钱包");
     try {
-      // 请求用户授权 登录
-      const selectedAddress = await window.ethereum.request({
+      var from = await window.web3.eth.getAccounts();
+      const msg = `0x${Buffer.from(exampleMessage, 'utf8').toString('hex')}`;
+      await window.ethereum.request({
+          "method": "personal_sign",
+          "params": [
+            msg,
+            from[0]
+          ]
+      });
+      const accounts = await window.ethereum.request({
         method: "eth_requestAccounts",
       });
-      setAddresses((selectedAddress || []) as string[]);
+      // 保存用户钱包地址
+      setAddresses((accounts || []) as string[]);
       localStorage.setItem(
         USER_WALLET_ADDRESS,
-        JSON.stringify(selectedAddress)
+        JSON.stringify(accounts)
       );
-    } catch (error) {
-      console.error(error);
-      return false;
+    } catch (err) {
+      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -56,11 +64,13 @@ export function useConnectMetamask() {
    * 最近交易记录
    */
   const getTransaction = async (address = addresses[0]) => {
-    console.log("🚀 ~ file: use-connect-metamask.ts:59 ~ getTransaction ~ address:", address)
     const contract  = new window.web3.eth.Contract(ETHContract, address)
     const transaction = await contract.getPastEvents('allEvents')
-    console.log("🚀 ~ file: use-connect-metamask.ts:61 ~ getTransaction ~ transaction:", transaction)
     setTransaction(transaction)
+    // enable sign
+    // const sign = await
+
+    window.web3.eth.getAccounts().then(console.log)
   };
 
   useEffect(() => {
@@ -85,6 +95,24 @@ export function useConnectMetamask() {
     const gasPriceWei = window.web3.utils.toWei(gasPrice, "gwei");
   }
 
+
+  /**
+   * 签名
+   * @param signStr 签名字符串
+   */
+  const sign = async (signStr = '') => {
+    try {
+      const sign = await window.web3.eth.sign(
+        // MetaMask - RPC Error: eth_sign requires 32 byte message hash 
+        //
+        window.web3.utils.sha3(signStr)
+      , addresses[0])
+    } catch (error) {
+      console.error(error);
+      alert('签名失败')
+    }
+  }
+
   /**
    * 当前链接状态
    */
@@ -106,6 +134,7 @@ export function useConnectMetamask() {
     addresses,
     isConnect,
     disconnect,
+    sign,
     connectMetamask,
     getTransaction,
   };
