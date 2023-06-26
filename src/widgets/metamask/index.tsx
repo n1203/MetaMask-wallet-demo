@@ -15,23 +15,24 @@ const Dashboard = ({metamask = {}}: any) => {
           <a target="_blank" href={`https://etherscan.io/address/${metamask.addresses[0]}`} className=" hover:underline">`{hashName(metamask.addresses[0])}`</a>
           交易记录
         </div>
-        <Button onClick={() => {
-          metamask.getTransaction("0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2")
-        }}>
-          `{hashName('0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2')}`测试数据
-        </Button>
-        <Button onClick={() => {
-          metamask.getTransaction()
-        }}>
-          钱包正常数据
-        </Button>
-        <div className="border rounded-lg p-0.5 px-1">
-          <input ref={signInputRef} type="text" />
-          <button className="ml-2" onClick={() => {
+        <b className="ml-2 bg-white border border-gray-300 rounded-md px-2 py-0.5">💰 {metamask.balance} ETH</b>
+        <div className="border border-gray-300 rounded-md py-0.5 px-1">
+          <input className=" border-none outline-none" ref={signInputRef} type="text" />
+          <button className=" bg-black text-white px-1 rounded" onClick={() => {
             metamask.sign(signInputRef.current.value)
           }}>签名</button>
         </div>
-        <b className="ml-2 bg-white border border-gray-300 rounded-md px-2 py-0.5">💰 {metamask.balance} ETH</b>
+        <div className=" cursor-pointer hover:underline" onClick={() => {
+          metamask.getTransaction("0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2")
+        }}>
+          `{hashName('0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2')}`测试数据
+        </div>
+        <div className=" cursor-pointer hover:underline" onClick={() => {
+          metamask.getTransaction()
+        }}>
+          钱包正常数据
+        </div>
+        
       </h1>
       <div className="flex flex-col gap-2 mt-4 pr-4 pb-8 h-full overflow-y-scroll">
         {metamask.transaction.map((item: any, index) => {
@@ -45,6 +46,9 @@ const Dashboard = ({metamask = {}}: any) => {
             </div>
           </div>
         })}
+        {metamask.transaction.length === 0 && <div className="flex items-center justify-center h-full">
+          🈚️ 暂无数据  
+        </div>}
       </div>
     </div>
   );
