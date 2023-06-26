@@ -1,11 +1,13 @@
+// @ts-nocheck
+
 /**
  * 链接metamask钱包
  * 参考文章：https://hicoldcat.com/posts/blockchain/how-to-build-a-web3-login-with-web3js-library/
  */
-import { USER_WALLET_ADDRESS } from "@/const/localstorage";
-import { useEffect, useMemo, useState } from "react";
 import Web3 from "web3";
 import ETHContract from "@/abi/ETH.json";
+import { useEffect, useMemo, useState } from "react";
+import { USER_WALLET_ADDRESS } from "@/const/localstorage";
 
 export function useConnectMetamask() {
   // 用户钱包地址集合
@@ -67,17 +69,12 @@ export function useConnectMetamask() {
     const contract  = new window.web3.eth.Contract(ETHContract, address)
     const transaction = await contract.getPastEvents('allEvents')
     setTransaction(transaction)
-    // enable sign
-    // const sign = await
-
-    window.web3.eth.getAccounts().then(console.log)
   };
 
   useEffect(() => {
     if (!addresses.length) return;
     getBalance();
     getTransaction();
-    getGasPrice();
   }, [addresses]);
 
   /**
@@ -88,25 +85,16 @@ export function useConnectMetamask() {
     setAddresses([]);
   };
 
-  const getGasPrice = async () => {
-    const gasPrice = await window.web3.eth.getGasPrice();
-    console.log(gasPrice);
-    // 解析
-    const gasPriceWei = window.web3.utils.toWei(gasPrice, "gwei");
-  }
-
-
   /**
    * 签名
    * @param signStr 签名字符串
    */
   const sign = async (signStr = '') => {
     try {
-      const sign = await window.web3.eth.sign(
-        // MetaMask - RPC Error: eth_sign requires 32 byte message hash 
-        //
+      await window.web3.eth.sign(
         window.web3.utils.sha3(signStr)
       , addresses[0])
+      alert('签名成功')
     } catch (error) {
       console.error(error);
       alert('签名失败')
